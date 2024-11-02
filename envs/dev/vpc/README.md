@@ -4,7 +4,7 @@
 
    1.1 Comment NAT Gateway, Route Table and the rest [RTB need to reference public & private subnet in another directory].
        
-      1.1.1 if don't comment NAT-GW, Route Table, The prompt will show error, There are no referrent existed. 
+      if don't comment NAT-GW, Route Table, The prompt will show error, There are no referrent existed. 
    
    1.2 Comment data.tf in this folder [Reason same as 1.1].
    
