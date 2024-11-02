@@ -24,7 +24,9 @@ resource "aws_eip" "dev-nat-eip" {
 }
 
 resource "aws_subnet" "public_asso_ip" {
-  vpc_id            = aws_vpc.dev-vpc.id // Correct
+  // This subnet is created for attached with NAT Gateway purpose only.
+  // This subnet must be located in public zone
+  vpc_id            = aws_vpc.dev-vpc.id
   cidr_block        = var.public_asso_ip
   availability_zone = var.ap-southeast-1-azs[0]
   tags = {
@@ -34,6 +36,8 @@ resource "aws_subnet" "public_asso_ip" {
 
 // NAT gateway
 resource "aws_nat_gateway" "dev-nat-gw" {
+  // NAT Gateway must associate with public subnet only
+  // If NAT Gateway using private subnet, Resources are unable to connect internet.
   allocation_id = aws_eip.dev-nat-eip.id
   subnet_id     = aws_subnet.public_asso_ip.id
   depends_on    = [aws_internet_gateway.dev-igw]
