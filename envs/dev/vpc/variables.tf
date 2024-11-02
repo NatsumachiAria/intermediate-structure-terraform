@@ -3,7 +3,6 @@ variable "aws_region" {
 }
 
 variable "env_prefix" {
-  // This variable is received value from user.
   description = "specific environment"
   default     = "dev"
 }
