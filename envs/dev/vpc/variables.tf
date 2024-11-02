@@ -23,8 +23,3 @@ variable "ap-southeast-1-azs" {
   type        = list(string)
   default     = ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]
 }
-/* variable "public_subnets" {
-  description = "public_subnets"
-  type = list(string)
-  default = data.terraform_remote_state.subnet.outputs.public_subnets
-} */
