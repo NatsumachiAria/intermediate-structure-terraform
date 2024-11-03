@@ -1,6 +1,12 @@
 ### How to create VPC and networking component.
 
-1. Create VPC, Internet Gateway, Elastic-IP, Public-asso-Subnet first.
+1. Run "terraform apply --auto-approve" at folder ../vpc  first to create VPC, Internet Gateway and NAT Gateway.
+
+2. Go to  ../subnet  folder to create subnets and attaced to route tables.
+
+
+<!--Ignore this part
+ 1. Create VPC, Internet Gateway, Elastic-IP, Public-asso-Subnet first.
 
    1.1 Comment NAT Gateway, Route Table and the rest [RTB need to reference public & private subnet in another directory].
        
@@ -13,13 +19,17 @@
 2. Go to folder ..envs/dev/subnet, then create public & private subnets.
 
 3. Remove comment NAT Gateway, Route table and the rest. then run "terraform apply --auto-approve" to complete networking
-   public & private zones.
+   public & private zones. -->
 
 
 
 ### How to delete all resources.
 
-//Cannot delete directly because the referrent resources cannot delete
+1. Run "terraform destroy --auto-approve" at folder ../subnet
+
+2. Go to folder ../vpc then run command "terraform destroy --auto-approve"
+
+<!-- //Cannot delete directly because the referrent resources cannot delete
 
 1. Delete public and private subnets from folder ../subnet first.
 
@@ -31,4 +41,4 @@
    
       terraform is going to delete that resources automatically.
    
-   2.2 Run "terraform destroy --auto-approve" 
+   2.2 Run "terraform destroy --auto-approve"  -->
