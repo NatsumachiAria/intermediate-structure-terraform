@@ -1,11 +1,11 @@
 output "eks-private-subnets" {
   description = "private_subnets"
-  value       = aws_subnet.eks-private-subnets[*].id
+  value       = aws_subnet.eks-private-subnet[*].id
 }
 
 output "eks-public-subnets" {
   description = "public_subnets"
-  value       = aws_subnet.eks-public-subnets[*].id
+  value       = aws_subnet.eks-public-subnet[*].id
 }
 
 output "eks-cluster-name" {
@@ -21,6 +21,6 @@ output "eks-cluster-id" {
   value = aws_eks_cluster.demo.cluster_id
 }
 
-output "eks_cluster_autoscaler_arn" {
+/* output "eks_cluster_autoscaler_arn" {
   value = aws_iam_role.eks_cluster_autoscaler.arn
-}
+} */

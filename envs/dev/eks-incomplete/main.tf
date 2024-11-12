@@ -38,18 +38,8 @@ resource "aws_eks_cluster" "demo" {
   role_arn = aws_iam_role.demo.arn
 
   vpc_config {
-       subnet_ids = concat("${aws_subnet.eks-private-subnets[*].id}", "${aws_subnet.eks-public-subnets[*].id}")
-    /* subnet_ids = [
-      "${aws_subnet.eks-private-subnets[*].id}",
-      aws_subnet.eks-private-subnets-1.id,
-      aws_subnet.eks-private-subnets-2.id,
-      aws_subnet.eks-private-subnets-3.id,
-      aws_subnet.eks-public-subnets-1.id,
-      aws_subnet.eks-public-subnets-2.id,
-      aws_subnet.eks-public-subnets-3.id 
-      "${aws_subnet.eks-public-subnets[*].id}"
-    ] */
+    subnet_ids = concat("${aws_subnet.eks-private-subnet[*].id}", "${aws_subnet.eks-public-subnet[*].id}")
   }
 
   depends_on = [aws_iam_role_policy_attachment.demo-AmazonEKSClusterPolicy]
-}
+} 

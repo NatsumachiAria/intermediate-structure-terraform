@@ -1,5 +1,3 @@
-# role for nodegroup
-
 resource "aws_iam_role" "nodes" {
   name = "eks-node-group-nodes"
 
@@ -14,8 +12,6 @@ resource "aws_iam_role" "nodes" {
     Version = "2012-10-17"
   })
 }
-
-# IAM policy attachment to nodegroup
 
 resource "aws_iam_role_policy_attachment" "nodes-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
@@ -32,32 +28,31 @@ resource "aws_iam_role_policy_attachment" "nodes-AmazonEC2ContainerRegistryReadO
   role       = aws_iam_role.nodes.name
 }
 
-
-# aws node group 
+resource "aws_iam_role_policy_attachment" "nodes-ssm-policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.nodes.name
+}
 
 resource "aws_eks_node_group" "private-nodes" {
   cluster_name    = aws_eks_cluster.demo.name
   node_group_name = "private-nodes"
   node_role_arn   = aws_iam_role.nodes.arn
 
-  subnet_ids = "${aws_subnet.eks-private-subnets[*].id}"
+  subnet_ids = [
+    aws_subnet.eks-private-subnet[0].id,
+    aws_subnet.eks-private-subnet[1].id,
+    aws_subnet.eks-private-subnet[2].id
+    /* aws_subnet.private-ap-southeast-1a.id,
+    aws_subnet.private-ap-southeast-1b.id */
 
-   /* subnet_ids = [
-    aws_subnet.eks-private-subnets-1a.id,
-    aws_subnet.eks-private-subnets-1b.id,
-    aws_subnet.eks-private-subnets-1c.id
-    aws_subnet.eks-private-subnets-1.id,
-    aws_subnet.eks-private-subnets-2.id,
-    aws_subnet.eks-private-subnets-3.id 
-    aws_subnet.eks-private-subnets[*].id
-  ] */ 
+  ]
 
   capacity_type  = "ON_DEMAND"
-  instance_types = ["t2.medium"]
+  instance_types = ["t3.small"]
 
   scaling_config {
     desired_size = 1
-    max_size     = 2
+    max_size     = 5
     min_size     = 0
   }
 
@@ -66,7 +61,7 @@ resource "aws_eks_node_group" "private-nodes" {
   }
 
   labels = {
-    node = "kubenode02"
+    role = "general"
   }
 
   # taint {
@@ -84,10 +79,9 @@ resource "aws_eks_node_group" "private-nodes" {
     aws_iam_role_policy_attachment.nodes-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.nodes-AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.nodes-AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.nodes-ssm-policy,
   ]
 }
-
-# launch template if required
 
 # resource "aws_launch_template" "eks-with-disks" {
 #   name = "eks-with-disks"

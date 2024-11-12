@@ -14,7 +14,7 @@ variable "vpc_cidr_block" {
 
 variable "public_asso_ip" {
   description = "public_asso_ip" // use for public ip which associated (or reference) in public networking zone
-  default     = "10.0.100.0/28"
+  default     = "10.0.224.16/28"
 }
 
 variable "ap-southeast-1-azs" {

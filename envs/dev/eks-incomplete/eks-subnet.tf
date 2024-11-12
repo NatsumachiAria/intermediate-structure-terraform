@@ -1,26 +1,24 @@
-resource "aws_subnet" "eks-public-subnets" {
-  vpc_id                  = data.terraform_remote_state.dev-vpc.outputs.dev_vpc_id // Correct
-  count                   = length(var.eks-public-subnets)
-  cidr_block              = var.eks-public-subnets[count.index]
-  availability_zone       = var.ap-southeast-1-azs[count.index]
-  map_public_ip_on_launch = true
+resource "aws_subnet" "eks-private-subnet" {
+  vpc_id            = data.terraform_remote_state.dev-vpc.outputs.dev_vpc_id
+  count             = length(var.eks-private-subnet)
+  cidr_block        = var.eks-private-subnet[count.index]
+  availability_zone = var.ap-southeast-1-azs[count.index]
   tags = {
-    Name : "${var.env_prefix}-eks-public-subnets-${count.index + 1}"
-    "kubernetes.io/role/elb"     = "1" #this instruct the kubernetes to create public load balancer in these subnets
-    "kubernetes.io/cluster/demo" = "owned" /* /demo  is a name of eks cluster, We can change it as we change cluster name. */
-
+    "Name"                            = "eks-private-subnets-${count.index + 1}"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/demo"      = "owned"
   }
 }
 
-resource "aws_subnet" "eks-private-subnets" {
-  vpc_id            = data.terraform_remote_state.dev-vpc.outputs.dev_vpc_id // Correct
-  count             = length(var.eks-private-subnets)
-  cidr_block        = var.eks-private-subnets[count.index]
+resource "aws_subnet" "eks-public-subnet" {
+  vpc_id            = data.terraform_remote_state.dev-vpc.outputs.dev_vpc_id
+  count             = length(var.eks-public-subnet)
+  cidr_block        = var.eks-public-subnet[count.index]
   availability_zone = var.ap-southeast-1-azs[count.index]
   tags = {
-    Name : "${var.env_prefix}-eks-private-subnets-${count.index + 1}"
-    "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/demo"      = "owned"
+    "Name"                       = "eks-public-subnets-${count.index + 1}"
+    "kubernetes.io/role/elb"     = "1"
+    "kubernetes.io/cluster/demo" = "owned"
   }
 }
 
@@ -47,8 +45,8 @@ resource "aws_route_table" "dev-eks-public-rtb" {
 
 // Route table Public associated
 resource "aws_route_table_association" "eks-public-rtb-asc" {
-  count          = length(var.eks-public-subnets)
-  subnet_id      = aws_subnet.eks-public-subnets[count.index].id
+  count          = length(var.eks-public-subnet)
+  subnet_id      = aws_subnet.eks-public-subnet[count.index].id
   route_table_id = aws_route_table.dev-eks-public-rtb.id
 }
 
@@ -68,7 +66,7 @@ resource "aws_route_table" "dev-eks-private-rtb" {
 }
 
 resource "aws_route_table_association" "eks-private-rtb-asc" {
-  count          = length(var.eks-private-subnets)
-  subnet_id      = aws_subnet.eks-private-subnets[count.index].id
+  count          = length(var.eks-private-subnet)
+  subnet_id      = aws_subnet.eks-private-subnet[count.index].id
   route_table_id = aws_route_table.dev-eks-private-rtb.id
 }
