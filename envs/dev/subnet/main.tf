@@ -8,6 +8,17 @@ resource "aws_subnet" "private_subnets" {
   }
 }
 
+// Subnets for RDS
+resource "aws_subnet" "rds_private_subnets" {
+  vpc_id            = data.terraform_remote_state.dev-vpc.outputs.dev_vpc_id // Correct
+  count             = length(var.rds_private_subnets)
+  cidr_block        = var.rds_private_subnets[count.index]
+  availability_zone = var.ap-southeast-1-azs[count.index]
+  tags = {
+    Name : "${var.env_prefix}-rds-private-subnets-${count.index + 1}"
+  }
+}
+
 resource "aws_subnet" "public_subnets" {
   vpc_id                  = data.terraform_remote_state.dev-vpc.outputs.dev_vpc_id // Correct
   count                   = length(var.public_subnets)
@@ -69,5 +80,14 @@ resource "aws_route_table_association" "private-rtb-asc" {
   //subnet_id      = each.value
   count          = length(var.private_subnets)
   subnet_id      = aws_subnet.private_subnets[count.index].id
+  route_table_id = aws_route_table.dev-private-rtb.id
+}
+
+resource "aws_route_table_association" "rds-private-rtb-asc" {
+  //for_each       = toset(aws_subnet.private_subnets[*].id)
+  //for_each       = toset(var.private_subnets)
+  //subnet_id      = each.value
+  count          = length(var.rds_private_subnets)
+  subnet_id      = aws_subnet.rds_private_subnets[count.index].id
   route_table_id = aws_route_table.dev-private-rtb.id
 }
